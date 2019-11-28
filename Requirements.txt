@@ -1,0 +1,5 @@
+tinydb
+tinydb_serialization
+dateparser
+requests
+beautifulsoup4
