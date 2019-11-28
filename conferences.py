@@ -76,13 +76,14 @@ def get_and_update():
         title = evnt.find(class_='sub_title').text.strip()
         timeloc = evnt.find(class_='dates_location').find(class_='conflist_value').text
         time, loc = (_.strip() for _ in timeloc.split('•'))
+        loc = loc.replace('\n', '')
         abstract_label = evnt.find(text='Abstract:')
         if abstract_label is not None:
             abstract = abstract_label.find_next(class_='conflist_value').text.strip()
         else:
             abstract = ''
         id = int(evnt.find(text='Event listing ID:').find_next(class_='conflist_inline').text)
-        url = evnt.find(text='Event website:').find_next('a').href
+        url = evnt.find(text='Event website:').find_next('a')['href']
 
         if ' - ' in time:
             start, end = time.split(' - ')
@@ -158,11 +159,16 @@ def print_conferences(conferences):
         conf['start'] = conf['start'].strftime('%d/%m')
         conf['end'] = conf['end'].strftime('%d/%m/%Y')
         conf['notify'] = '  ' if (NOW - conf['date_added']).total_seconds() > dtmax else '* '
-        print('{notify}{title:40s}: {start} to {end} @ {loc}'.format(**conf))
+        # See https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+        conf['title'] = '\u009d8;;{url}\u009c{title:40s}\u009d8;;\u009c'.format(url=conf['url'], title=conf['title'])
+        print(r'{notify}{title}: {start} to {end} @ {loc}'.format(**conf))
     
     for new, conf in zip(new_addition, conferences):
         if not new:
             print_helper(conf)
+
+    if not any(new_addition):
+        return
     print()
     print('NEW ADDITIONS:')
     for new, conf in zip(new_addition, conferences):
