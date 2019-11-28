@@ -3,6 +3,7 @@ import requests
 import dateparser
 from tinydb import TinyDB, Query, where
 from tinydb_serialization import SerializationMiddleware, Serializer
+import xdg
 
 import sys
 import os
@@ -11,6 +12,9 @@ import argparse
 import re
 
 NOW = datetime.now()
+DB_PATH = os.path.join(xdg.XDG_CONFIG_HOME, 'conferences', 'db.json')
+if not os.path.isdir(os.path.dirname(DB_PATH)):
+    os.makedirs(os.path.dirname(DB_PATH))
 
 # Serialize/deserialize dates
 class DateTimeSerializer(Serializer):
@@ -106,7 +110,7 @@ def get_and_update():
 
     # Open database
     print('Storing in local database')
-    db = TinyDB('conferences_db.json', storage=serialization)
+    db = TinyDB(DB_PATH, storage=serialization)
 
     # Store in database
     Conf = Query()
@@ -134,7 +138,7 @@ def list_conferences(start=None, end=None):
     start, end : datetime object | None
         start and end date for query.
     """
-    db = TinyDB('conferences_db.json', storage=serialization)
+    db = TinyDB(DB_PATH, storage=serialization)
 
     Conf = Query()
     
@@ -154,26 +158,29 @@ def print_conferences(conferences):
     for conf in conferences:
         new_addition.append((NOW - conf['date_added']).total_seconds() < dtmax)
 
-    def print_helper(conf):
-        conf['title'] = cut_long_str(conf['title'])
-        conf['start'] = conf['start'].strftime('%d/%m')
-        conf['end'] = conf['end'].strftime('%d/%m/%Y')
-        conf['notify'] = '  ' if (NOW - conf['date_added']).total_seconds() > dtmax else '* '
-        # See https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
-        conf['title'] = '\u009d8;;{url}\u009c{title:40s}\u009d8;;\u009c'.format(url=conf['url'], title=conf['title'])
-        print(r'{notify}{title}: {start} to {end} @ {loc}'.format(**conf))
-    
-    for new, conf in zip(new_addition, conferences):
-        if not new:
-            print_helper(conf)
+    class Helper():
+        prev_year = 99999
+        def __call__(self, conf):
+            year = conf['start'].year
+            if self.prev_year != year:
+                print()
+                print('%d:' % year)
+                self.prev_year = year
+            conf['title'] = cut_long_str(conf['title'])
+            conf['start'] = conf['start'].strftime('%d/%m')
+            conf['end'] = conf['end'].strftime('%d/%m/%Y')
+            if (NOW - conf['date_added']).total_seconds() < dtmax:
+                conf['notify'] = '\x1b[6;30;42m' + ' * ' + '\x1b[0m'
+            else:
+                conf['notify'] = '   '
+            # See https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda
+            conf['title'] = '\u009d8;;{url}\u009c{title:40s}\u009d8;;\u009c'.format(url=conf['url'], title=conf['title'])
 
-    if not any(new_addition):
-        return
-    print()
-    print('NEW ADDITIONS:')
+            print(r'{notify}{title}: {start} to {end} @ {loc}'.format(**conf))
+    
+    print_helper = Helper()
     for new, conf in zip(new_addition, conferences):
-        if new:
-            print_helper(conf)
+        print_helper(conf)
 
 
 if __name__ == '__main__':
