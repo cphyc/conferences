@@ -3,4 +3,4 @@ tinydb_serialization
 dateparser
 requests
 beautifulsoup4
-xdg
+pyxdg

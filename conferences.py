@@ -3,7 +3,7 @@ import requests
 import dateparser
 from tinydb import TinyDB, Query, where
 from tinydb_serialization import SerializationMiddleware, Serializer
-import xdg
+from xdg.BaseDirectory import xdg_config_home
 
 import sys
 import os
@@ -12,7 +12,7 @@ import argparse
 import re
 
 NOW = datetime.now()
-DB_PATH = os.path.join(xdg.XDG_CONFIG_HOME, 'conferences', 'db.json')
+DB_PATH = os.path.join(xdg_config_home, 'conferences', 'db.json')
 if not os.path.isdir(os.path.dirname(DB_PATH)):
     os.makedirs(os.path.dirname(DB_PATH))
 
