@@ -1,5 +1,7 @@
 Query the list of international conferences in astronomy and astrophysics, store them locally and highlight the recently annouced ones.
 
+![List of conferences](/screenshot.png?raw=true "Screenshot")
+
 # Install
 Clone the repository, install the requirements and run `conferences.py`. 
 ```
