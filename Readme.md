@@ -26,5 +26,5 @@ optional arguments:
                         Latest date when printing.
   -s, --silent          Do not print conferences.
 ```
-Note that you the input format for `-f` and `-t` is *very* flexible. It accepts human-formatted, including for example `--to next year`, `--from 31 Dec. 2019`, etc. It relies on the awesome https://github.com/scrapinghub/dateparser for this.
+Note that the input format for `-f` and `-t` is *very* flexible. It accepts human-formatted dates, including for example `--to next year`, `--from 31 Dec. 2019`, etc. It relies on the awesome https://github.com/scrapinghub/dateparser for this.
 
