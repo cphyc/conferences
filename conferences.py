@@ -129,13 +129,13 @@ def get_and_update():
 
     header = '%s NEW CONFERENCES ADDED' % len(new_conferences)
     print_boxed(header)
-    
+
     print_conferences(new_conferences)
 
 
 def list_conferences(start=None, end=None):
     """Print all conferences.
-    
+
     Arguments:
     ----------
     start, end : datetime object | None
@@ -144,7 +144,7 @@ def list_conferences(start=None, end=None):
     db = TinyDB(DB_PATH, storage=serialization)
 
     Conf = Query()
-    
+
     q = Conf
     if start is not None:
         q &= Conf.end >= start
@@ -180,7 +180,7 @@ def print_conferences(conferences):
             conf['title'] = '\u009d8;;{url}\u009c{title:40s}\u009d8;;\u009c'.format(url=conf['url'], title=conf['title'])
 
             print(r'{notify}{title}: {start} to {end} @ {loc}'.format(**conf))
-    
+
     print_helper = Helper()
     for new, conf in zip(new_addition, conferences):
         print_helper(conf)
@@ -190,7 +190,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Interact with conferences from conference-service.com')
     parser.add_argument('-u', '--update', action='store_true', help='Update database.')
 
-    parser.add_argument('-f', '--from', dest='start', action=DateArgAction, nargs='+', default=NOW, 
+    parser.add_argument('-f', '--from', dest='start', action=DateArgAction, nargs='+', default=NOW,
                         help='Earliest date when printing (default: now).')
     parser.add_argument('-t', '--to', dest='end', action=DateArgAction, nargs='+', default=None,
                         help='Latest date when printing.')
