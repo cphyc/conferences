@@ -116,7 +116,10 @@ def get_and_update():
     Conf = Query()
     new_conferences = []
     for conf in conferences:
-        q = Conf.online_id == conf['online_id']
+        q = ((Conf.online_id == conf['online_id']) |
+             ((Conf.start == conf['start']) &
+              (Conf.end == conf['end']) &
+              (Conf.loc == conf['loc'])))
         if len(db.search(q)) == 0:
             new_conferences.append(conf)
             conf['date_added'] = NOW
